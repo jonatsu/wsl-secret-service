@@ -69,7 +69,9 @@ BUS_PID=""
 
 cleanup() {
     local code=$?
-    stop_daemon || true
+    # Only stop a daemon on the private bus: before setup_bus runs, --session
+    # would resolve to the caller's real session bus.
+    [[ -n "$BUS_PID" ]] && { stop_daemon || true; }
     [[ -n "$BUS_PID" ]] && kill "$BUS_PID" 2>/dev/null
     rm -rf "$TMP"
     echo ""
